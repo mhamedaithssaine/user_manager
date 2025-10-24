@@ -1,39 +1,15 @@
-package com.example.entity;
+package com.example.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import javax.persistence.*;
+import com.example.entity.Role;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "users", uniqueConstraints = @UniqueConstraint(columnNames = "email"))
-public class User {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class UserResponseDTO {
     private Long id;
-
-    @Column(nullable = false, length = 100)
     private String name;
-
-    @Column(nullable = false, unique = true)
     private String email;
-
-    @Column(nullable = false)
-    private String password;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Role role;
-
-    private Boolean active = true;
+    private Boolean active;
     private LocalDateTime createdAt;
-
-    @PrePersist
-    public void prePersist() {
-        createdAt = LocalDateTime.now();
-    }
 
     // Getters & Setters
     public Long getId() { return id; }
@@ -44,9 +20,6 @@ public class User {
 
     public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
-
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }

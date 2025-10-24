@@ -1,51 +1,48 @@
 package com.example.controller;
 
-import com.example.entity.User;
+import com.example.dto.*;
 import com.example.service.UserService;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
-    private final UserService userService;
+    private final UserService service;
 
     @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public UserController(UserService service) {
+        this.service = service;
     }
 
-
     @PostMapping
-    public User createUser(@RequestBody User user) {
-        return userService.save(user);
+    public ResponseEntity<UserResponseDTO> create(@Valid @RequestBody UserCreateDTO dto) {
+        return ResponseEntity.status(201).body(service.create(dto));
     }
 
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.findAll();
+    public ResponseEntity<List<?>> findAll() {
+        return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
-    public User getUserById(@PathVariable Long id) {
-        return userService.findById(id);
-    }
-
-    @DeleteMapping("/{id}")
-    public void deleteUser(@PathVariable Long id) {
-        userService.deleteById(id);
+    public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(service.findById(id));
     }
 
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        User existingUser = userService.findById(id);
-        if (existingUser == null) return null;
+    public ResponseEntity<UserResponseDTO> update(@PathVariable Long id, @Valid @RequestBody UserUpdateDTO dto) {
+        return ResponseEntity.ok(service.update(id, dto));
+    }
 
-        existingUser.setName(user.getName());
-        existingUser.setEmail(user.getEmail());
-        return userService.save(existingUser);
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        service.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }
