@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:latest
+    container_name: management_users_postgres
+    environment:
+      POSTGRES_DB: user_manager_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "1111:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U Usermanager -d user_manager_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: user_management_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - db
+
+  tomcat:
+    image: tomcat:9.0-jdk17
+    container_name: user_management_tomcat
+    ports:
+      - "8086:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+    - ./target/spring-user-mgt.war:/usr/local/tomcat/webapps/ROOT.war
+
+    command: [ "catalina.sh", "run" ]
+
+
+
+volumes:
+  postgres_data:
